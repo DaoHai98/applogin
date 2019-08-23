@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-if (isset($_SESSION["loggedin"]) || ($_SESSION["loggedin"] == true)){
+if (isset($_SESSION["loggedin"]) && ($_SESSION["loggedin"] == true)){
     header("Location: index.php");
     exit;
 }
@@ -22,30 +22,45 @@ if(isset($_POST)&&!empty($_POST)){
     }
     if(is_array($errors) && empty($errors)){
        $username=$_POST["username"];
-       $password=$_POST["password"];
+       $password=md5($_POST["password"]);
 
-       $sqlLogin="SELECT * FROM users WHERE username=? AND password=?";
+       $sqlLogin="SELECT * FROM users WHERE username = ? AND password = ?";
         $stmt = $connection->prepare($sqlLogin);
         //Bind 3 biến vào trong câu lệnh SQL
         $stmt->bind_param("ss", $username, $password);
 
         $stmt->execute();
         $res=$stmt->get_result();
-        if(isset($row["id"])&&($row["id"]>0)){
-            $_SESSION["loggedin"]=true;
-            $_SESSION["username"]=$row["username"];
 
-            echo"<pre>";
-            print_r($row);
-            echo"</pre>";
+        $row=$res->fetch_array(MYSQLI_ASSOC);
+        if(isset($row['id'])&&($row['id']>0)){
+            /*
+             * nếu tồn tại bản ghi
+             * thì sẽ tạo ra session đăng nhập
+             */
+
+
+            $_SESSION["loggedin"]=true;
+            $_SESSION["username"]=$row['username'];
+            header("Location: index.php");
+            exit;
+
+
+        }else{
+            $errors[]="Thông tin đăng nhập không đúng";
         }
 
 
     }
-    echo"<pre>";
-    print_r($_SESSION);
-    echo"</pre>";
+
 }
+if(is_array($errors)&&!empty($errors)){
+    $errors_string = implode("<br>", $errors);
+    echo "<div class='alert alert-danger'>";
+    echo $errors_string;
+    echo "</div>";
+}
+
 ?>
 
 <!DOCTYPE html>

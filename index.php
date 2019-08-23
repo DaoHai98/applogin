@@ -13,6 +13,10 @@ if(!isset($_SESSION["loggedin"])||($_SESSION["loggedin"] != true)){
     header("Location: login.php");
     exit;
 }
+
+echo"<pre>";
+print_r($_SESSION);
+echo"</pre>";
 /*
  * nếu đã đăng nhập thành công
  */
@@ -32,7 +36,7 @@ if(!isset($_SESSION["loggedin"])||($_SESSION["loggedin"] != true)){
        <div class="row">
            <div class="col-md-12">
                <h1>Đăng nhập thành công</h1>
-               <p>Tên người dùng: </p>
+               <p>Tên người dùng: <?php echo $_SESSION["username"] ?> </p>
                <p><a href="logout.php">Đăng xuất</a></p>
            </div>
        </div>
